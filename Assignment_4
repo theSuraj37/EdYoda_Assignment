@@ -1,0 +1,131 @@
+Assignemnt 4
+
+
+[root@ip-172-31-29-86 example-voting-app]# cd k8s-specifications/
+[root@ip-172-31-29-86 k8s-specifications]# kubectl apply -f .
+deployment.apps/db unchanged
+service/db unchanged
+deployment.apps/redis unchanged
+service/redis unchanged
+deployment.apps/result unchanged
+service/result unchanged
+deployment.apps/vote unchanged
+service/vote unchanged
+deployment.apps/worker unchanged
+
+Node Port is assigned for result pod and vote pod.
+[root@ip-172-31-29-86 k8s-specifications]# kubectl get svc
+NAME               TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+db                 ClusterIP   10.109.231.28    <none>        5432/TCP         6d22h
+kubia2             ClusterIP   10.99.10.99      <none>        80/TCP           7d
+mavenir-mysql      ClusterIP   10.110.227.195   <none>        3306/TCP         4d
+mysql-1654233610   ClusterIP   10.109.87.255    <none>        3306/TCP         4d
+redis              ClusterIP   10.102.110.130   <none>        6379/TCP         6d22h
+result             NodePort    10.104.112.168   <none>        5001:31001/TCP   6d22h
+vote               NodePort    10.97.134.12     <none>        5000:31000/TCP   6d22h
+
+Deleting voting pod
+[root@ip-172-31-29-86 k8s-specifications]# kubectl delete pod vote-94849dc97-wh4xk
+pod "vote-94849dc97-wh4xk" deleted
+[root@ip-172-31-29-86 k8s-specifications]# kubectl get pods -o wide
+NAME                                READY   STATUS    RESTARTS   AGE     IP              NODE                                               NOMINATED NODE   READINESS GATES
+db-b54cd94f4-62k89                  1/1     Running   0          6d22h   192.168.43.11   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-dkqnx                        1/1     Running   0          7d21h   192.168.43.10   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-kk66d                        1/1     Running   0          7d22h   192.168.43.8    ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-n72xv                        1/1     Running   0          3d23h   192.168.43.16   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-rtq4f                        1/1     Running   0          7d22h   192.168.43.9    ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+mavenir-mysql-54f7ddc699-nm8jg      0/1     Pending   0          3d23h   <none>          <none>                                             <none>           <none>
+mysql-1654233610-5cfcbc67f9-65vwg   0/1     Pending   0          3d23h   <none>          <none>                                             <none>           <none>
+redis-868d64d78-ks6xq               1/1     Running   0          6d22h   192.168.43.12   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+result-5d57b59f4b-556q2             1/1     Running   0          6d22h   192.168.43.13   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+vote-94849dc97-gp79d                1/1     Running   0          34s     192.168.43.17   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+worker-dd46d7584-s2mkh              1/1     Running   0          6d22h   192.168.43.15   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+[
+
+Observation: After deleting the voting pod nothing has been done. Means the new voting pod get created automatically and application is working fine.
+
+
+Deleting worker pod
+[root@ip-172-31-29-86 k8s-specifications]# kubectl delete pod worker-dd46d7584-s2mkh
+pod "worker-dd46d7584-s2mkh" deleted
+[root@ip-172-31-29-86 k8s-specifications]# kubectl get pods -o wide
+NAME                                READY   STATUS    RESTARTS   AGE     IP              NODE                                               NOMINATED NODE   READINESS GATES
+db-b54cd94f4-62k89                  1/1     Running   0          6d22h   192.168.43.11   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-dkqnx                        1/1     Running   0          7d22h   192.168.43.10   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-kk66d                        1/1     Running   0          7d22h   192.168.43.8    ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-n72xv                        1/1     Running   0          3d23h   192.168.43.16   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-rtq4f                        1/1     Running   0          7d22h   192.168.43.9    ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+mavenir-mysql-54f7ddc699-nm8jg      0/1     Pending   0          3d23h   <none>          <none>                                             <none>           <none>
+mysql-1654233610-5cfcbc67f9-65vwg   0/1     Pending   0          3d23h   <none>          <none>                                             <none>           <none>
+redis-868d64d78-ks6xq               1/1     Running   0          6d22h   192.168.43.12   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+result-5d57b59f4b-556q2             1/1     Running   0          6d22h   192.168.43.13   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+vote-94849dc97-gp79d                1/1     Running   0          4m22s   192.168.43.17   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+worker-dd46d7584-5csb9              1/1     Running   0          64s     192.168.43.18   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+
+Observation: After deleting worker pod the pod gets created automatically and it gets restarted.
+
+
+
+Deleting DB pod
+[root@ip-172-31-29-86 k8s-specifications]# kubectl delete pod db-b54cd94f4-62k89
+pod "db-b54cd94f4-62k89" deleted
+[root@ip-172-31-29-86 k8s-specifications]# kubectl get pods -o wide
+NAME                                READY   STATUS    RESTARTS   AGE     IP              NODE                                               NOMINATED NODE   READINESS GATES
+db-b54cd94f4-wwf48                  1/1     Running   0          97s     192.168.43.22   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-dkqnx                        1/1     Running   0          7d22h   192.168.43.10   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-kk66d                        1/1     Running   0          7d22h   192.168.43.8    ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-n72xv                        1/1     Running   0          3d23h   192.168.43.16   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-rtq4f                        1/1     Running   0          7d22h   192.168.43.9    ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+mavenir-mysql-54f7ddc699-nm8jg      0/1     Pending   0          3d23h   <none>          <none>                                             <none>           <none>
+mysql-1654233610-5cfcbc67f9-65vwg   0/1     Pending   0          4d      <none>          <none>                                             <none>           <none>
+redis-868d64d78-mpxhw               1/1     Running   0          2m1s    192.168.43.21   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+result-5d57b59f4b-556q2             1/1     Running   0          6d22h   192.168.43.13   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+vote-94849dc97-dt2kl                1/1     Running   0          11m     192.168.43.20   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+worker-dd46d7584-5csb9              1/1     Running   3          21m     192.168.43.18   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+[root@ip-172-31-29-86 k8s-specifications]#
+
+Observation: After deleting DB pod the vote counter at the result app went missing and the previous number of votes was cleared.
+
+
+Restarting vote pod
+[root@ip-172-31-29-86 k8s-specifications]# kubectl delete pod vote-94849dc97-dt2kl
+pod "vote-94849dc97-dt2kl" deleted
+[root@ip-172-31-29-86 k8s-specifications]# kubectl get pods -o wide
+NAME                                READY   STATUS    RESTARTS   AGE     IP              NODE                                               NOMINATED NODE   READINESS GATES
+db-b54cd94f4-wwf48                  1/1     Running   0          5m46s   192.168.43.22   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-dkqnx                        1/1     Running   0          7d22h   192.168.43.10   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-kk66d                        1/1     Running   0          7d22h   192.168.43.8    ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-n72xv                        1/1     Running   0          3d23h   192.168.43.16   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-rtq4f                        1/1     Running   0          7d22h   192.168.43.9    ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+mavenir-mysql-54f7ddc699-nm8jg      0/1     Pending   0          3d23h   <none>          <none>                                             <none>           <none>
+mysql-1654233610-5cfcbc67f9-65vwg   0/1     Pending   0          4d      <none>          <none>                                             <none>           <none>
+redis-868d64d78-mpxhw               1/1     Running   0          6m10s   192.168.43.21   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+result-5d57b59f4b-556q2             1/1     Running   0          6d22h   192.168.43.13   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+vote-94849dc97-2pmpp                1/1     Running   0          29s     192.168.43.23   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+worker-dd46d7584-5csb9              1/1     Running   3          25m     192.168.43.18   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+[root@ip-172-31-29-86 k8s-specifications]#
+
+Observation: Nothing has happened. No votes showing.
+
+
+Restarting result pod
+[root@ip-172-31-29-86 k8s-specifications]# kubectl delete pod result-5d57b59f4b-556q2
+pod "result-5d57b59f4b-556q2" deleted
+[root@ip-172-31-29-86 k8s-specifications]# kubectl get pods -o wide
+NAME                                READY   STATUS    RESTARTS   AGE     IP              NODE                                               NOMINATED NODE   READINESS GATES
+db-b54cd94f4-wwf48                  1/1     Running   0          9m3s    192.168.43.22   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-dkqnx                        1/1     Running   0          7d22h   192.168.43.10   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-kk66d                        1/1     Running   0          7d22h   192.168.43.8    ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-n72xv                        1/1     Running   0          3d23h   192.168.43.16   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-rtq4f                        1/1     Running   0          7d22h   192.168.43.9    ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+mavenir-mysql-54f7ddc699-nm8jg      0/1     Pending   0          4d      <none>          <none>                                             <none>           <none>
+mysql-1654233610-5cfcbc67f9-65vwg   0/1     Pending   0          4d      <none>          <none>                                             <none>           <none>
+redis-868d64d78-mpxhw               1/1     Running   0          9m27s   192.168.43.21   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+result-5d57b59f4b-b7hdz             1/1     Running   0          75s     192.168.43.24   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+vote-94849dc97-2pmpp                1/1     Running   0          3m46s   192.168.43.23   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+worker-dd46d7584-5csb9              1/1     Running   3          29m     192.168.43.18   ip-172-31-28-215.ap-southeast-1.compute.internal   <none>           <none>
+[root@ip-172-31-29-86 k8s-specifications]#
+
+
+Observation:
+Application working fine after restarting the result pod and the data from previous app gets deleted. and new data gets stored into the database.
